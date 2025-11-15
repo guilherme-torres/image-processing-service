@@ -17,3 +17,4 @@ class UserResponse(UserBase):
 class UserUpdate(SQLModel):
     username: Optional[str] = Field(default=None, max_length=30)
     password: Optional[str] = Field(default=None, max_length=255)
+
