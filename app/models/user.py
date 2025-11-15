@@ -1,10 +1,10 @@
 from typing import Optional
-from sqlmodel import SQLModel, Field
+from sqlmodel import Field
+from app.schemas.user import UserBase
 
 
-class User(SQLModel, table=True):
+class User(UserBase, table=True):
     __tablename__ = "users"
-    
+
     id: Optional[int] = Field(default=None, primary_key=True)
-    username: str = Field(unique=True, max_length=30)
     password_hash: str = Field(max_length=255)
