@@ -19,6 +19,7 @@ services:
     volumes:
       - "./app:/code/app"
       - "./migrations:/code/migrations"
+      - "./uploads:/code/uploads"
 
   postgres:
     image: postgres:14

@@ -7,7 +7,7 @@ from app.services.auth import AuthService
 
 router = APIRouter(prefix="/auth")
 
-@router.post("/login", response_model=LoginResponse, status_code=200)
+@router.post("/login/", response_model=LoginResponse, status_code=200)
 def login(
     data: LoginCreate,
     auth_service: AuthService = Depends(get_auth_service),
@@ -15,7 +15,7 @@ def login(
     return auth_service.login(data)
 
 
-@router.post("/token/refresh", response_model=LoginResponse, status_code=200)
+@router.post("/token/refresh/", response_model=LoginResponse, status_code=200)
 def refresh_access_token(
     data: RefreshTokenRequest,
     auth_service: AuthService = Depends(get_auth_service),

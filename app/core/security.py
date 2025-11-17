@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict
+from typing import Annotated, Any, Dict
+from fastapi import Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer
 import jwt
 from jwt.exceptions import (
     ExpiredSignatureError,
@@ -9,6 +11,9 @@ from jwt.exceptions import (
 )
 from pwdlib import PasswordHash
 from app.core.config import settings
+from app.core.dependencies import get_user_repo
+from app.repositories.user import UserRepository
+from app.schemas.user import UserResponse
 
 
 password_hash = PasswordHash.recommended()
@@ -74,3 +79,25 @@ def validate_refresh_token(token: str):
         secret=settings.JWT_REFRESH_SECRET,
         algorithm=settings.JWT_REFRESH_ALGORITHM,
     )
+
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+
+def get_current_user(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    user_repo: UserRepository = Depends(get_user_repo),
+) -> UserResponse:
+    credentials_exception = HTTPException(
+        status_code=401,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = validate_access_token(token)
+        user_id = int(payload.get("sub"))
+        user = user_repo.get(user_id)
+        if not user:
+            raise credentials_exception
+        return UserResponse(id=user.id, username=user.username)
+    except InvalidTokenError:
+        raise credentials_exception
