@@ -68,7 +68,7 @@ def validate_access_token(token: str):
     )
 
 
-def validade_refresh_token(token: str):
+def validate_refresh_token(token: str):
     return validate_token(
         token,
         secret=settings.JWT_REFRESH_SECRET,

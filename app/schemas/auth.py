@@ -9,3 +9,7 @@ class LoginCreate(SQLModel):
 class LoginResponse(SQLModel):
     access_token: str
     refresh_token: str
+
+
+class RefreshTokenRequest(SQLModel):
+    refresh_token: str
