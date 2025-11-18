@@ -22,15 +22,20 @@ class BaseRepository(Generic[ModelType]):
         return self.session.get(self.model, id)
     
 
-    def get_all(self, limit: int = 100, skip: int = 0) -> List[ModelType]:
-        return self.session.exec(select(self.model).offset(skip).limit(limit)).all()
+    def get_all(self, limit: int = 100, skip: int = 0, filter_by: Optional[dict] = None) -> List[ModelType]:
+        query = select(self.model)
+        if filter_by is not None:
+            for key, value in filter_by.items():
+                query = query.where(getattr(self.model, key) == value)
+        query = query.offset(skip).limit(limit)
+        return self.session.exec(query).all()
     
 
     def delete(self, id: int) -> bool:
         obj = self.get(id)
         if not obj:
             return False
-        self.session.delete()
+        self.session.delete(obj)
         self.session.commit()
         return True
     
