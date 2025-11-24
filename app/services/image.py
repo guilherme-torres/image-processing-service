@@ -123,10 +123,8 @@ class ImageService:
 
     def apply_transformation(self, image: Image.Image, transform_name: str, value: Any):
         def resize(options: dict) -> Image.Image:
-            print("resize")
             return image.resize(size=(options["width"], options["height"]))
         def crop(options: dict) -> Image.Image:
-            print("crop")
             return image.crop(box=(
                 options["x"],
                 options["y"],
@@ -134,13 +132,10 @@ class ImageService:
                 options["y"] + options["height"]
             ))
         def rotate(angle: float) -> Image.Image:
-            print("rotate")
             return image.rotate(angle)
         def change_format(format_name: str) -> Image.Image:
-            print("format")
             return image
         def apply_filters(options: dict) -> Image.Image:
-            print("filters")
             for filter_option in options.keys():
                 match filter_option:
                     case "grayscale":
@@ -152,7 +147,7 @@ class ImageService:
                             0.272, 0.534, 0.131, 0
                         ))
                     case _:
-                        raise HTTPException(status_code=400, detail="Invalid filter.")
+                        raise Exception("Invalid filter.")
             return image
         transformations = {
             "resize": resize,
@@ -164,14 +159,13 @@ class ImageService:
         return transformations[transform_name](value)
     
 
-    def transform(self, id: int, user_id: int, transformations: TransformationsCreate) -> ImageResponse:
-        transformations_dict = transformations.model_dump(exclude_none=True, exclude_unset=True)
+    def transform(self, id: int, user_id: int, transformations_dict: dict) -> ImageResponse:
         print(transformations_dict)
         image = self.image_repo.get(id)
         if not image:
-            raise HTTPException(status_code=404, detail="Image not found.")
+            raise Exception("Image not found.")
         if image.user_id != user_id:
-            raise HTTPException(status_code=403, detail="Operation not permitted.")
+            raise Exception("Operation not permitted.")
         parsed_url = urlparse(image.url)
         filename = parsed_url.path.split("/")[-1]
         print("filename:", filename)

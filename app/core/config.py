@@ -14,5 +14,8 @@ class Config(BaseSettings):
     JWT_REFRESH_EXPIRATION_SECONDS: int
     JWT_REFRESH_ALGORITHM: str
 
+    CELERY_BROKER_URL: str
+    CELERY_RESULT_BACKEND: str
+
 
 settings = Config()

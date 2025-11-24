@@ -6,6 +6,7 @@ from app.schemas.image import ImageResponse
 from app.schemas.transformations import TransformationsCreate
 from app.schemas.user import UserResponse
 from app.services.image import ImageService
+from app.tasks.image_processing import transform_image_task
 
 
 router = APIRouter(prefix="/images")
@@ -47,11 +48,11 @@ def delete_image(
     image_service.delete_image(id, current_user.id)
 
 
-@router.post("/{id}/transform/", response_model=ImageResponse)
+@router.post("/{id}/transform/")
 def transform_image(
     id: int,
     transformations: TransformationsCreate,
-    image_service: ImageService = Depends(get_image_service),
     current_user: UserResponse = Depends(get_current_user),
 ):
-    return image_service.transform(id, user_id=current_user.id, transformations=transformations)
+    transform_image_task.delay(id, current_user.id, transformations.model_dump(exclude_none=True, exclude_unset=True))
+    return {"message": "processando imagem"}
