@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, File, UploadFile
-
+from celery.result import AsyncResult
 from app.core.dependencies import get_image_service
 from app.core.security import get_current_user
 from app.schemas.image import ImageResponse
@@ -54,5 +54,17 @@ def transform_image(
     transformations: TransformationsCreate,
     current_user: UserResponse = Depends(get_current_user),
 ):
-    transform_image_task.delay(id, current_user.id, transformations.model_dump(exclude_none=True, exclude_unset=True))
-    return {"message": "processando imagem"}
+    task = transform_image_task.delay(id, current_user.id, transformations.model_dump(exclude_none=True, exclude_unset=True))
+    return {"task_id": task.id}
+
+
+@router.get("/tasks/{task_id}")
+def transform_image_task_result(
+    task_id: str,
+    current_user: UserResponse = Depends(get_current_user),
+):
+    task_result = AsyncResult(task_id)
+    if task_result.ready():
+        return task_result.get()
+    else:
+        return {"status": task_result.status}

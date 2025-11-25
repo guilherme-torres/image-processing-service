@@ -11,7 +11,9 @@ def transform_image_task(image_id: int, user_id: int, transformations_dict: dict
         try:
             image_repo = ImageRepository(session)
             image_service = ImageService(image_repo)
-            result = image_service.transform(image_id, user_id=user_id, transformations_dict=transformations_dict)
-            return result.model_dump()
+            result_dict = image_service.transform(image_id, user_id=user_id, transformations_dict=transformations_dict)
+            success = {"status": "success", "data": result_dict.model_dump()}
+            return success
         except Exception as e:
-            return {"status": "error", "message": str(e)}
+            error = {"status": "error", "message": str(e)}
+            return error

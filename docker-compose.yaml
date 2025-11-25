@@ -16,6 +16,9 @@ services:
       - JWT_REFRESH_ALGORITHM=${JWT_REFRESH_ALGORITHM}
       - CELERY_BROKER_URL=${CELERY_BROKER_URL}
       - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_DB=${REDIS_DB}
     depends_on:
       - postgres
       - rabbitmq
@@ -44,6 +47,9 @@ services:
       - JWT_REFRESH_ALGORITHM=${JWT_REFRESH_ALGORITHM}
       - CELERY_BROKER_URL=${CELERY_BROKER_URL}
       - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_DB=${REDIS_DB}
     volumes:
       - "./app:/code/app"
       - "./uploads:/code/uploads"
